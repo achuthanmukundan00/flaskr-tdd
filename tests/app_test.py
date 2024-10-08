@@ -1,10 +1,10 @@
-import os
 import pytest
 import json
 from pathlib import Path
 from project.app import app, db, models
 
 TEST_DB = "test.db"
+
 
 @pytest.fixture
 def client():
@@ -17,6 +17,7 @@ def client():
         db.create_all()  # setup
         yield app.test_client()  # tests run here
         db.drop_all()  # teardown
+
 
 def login(client, username, password):
     """Login helper function"""
@@ -73,6 +74,7 @@ def test_messages(client):
     assert b"&lt;Hello&gt;" in rv.data
     assert b"<strong>HTML</strong> allowed here" in rv.data
 
+
 def test_delete_message(client):
     """Ensure the messages are being deleted"""
     rv = client.get("/delete/1")
@@ -82,6 +84,7 @@ def test_delete_message(client):
     rv = client.get("/delete/1")
     data = json.loads(rv.data)
     assert data["status"] == 1
+
 
 def test_search(client):
     # Log in using the helper function
@@ -103,6 +106,10 @@ def test_search(client):
         "/search", query_string={"query": "test"}, follow_redirects=True
     )
     assert response.status_code == 200
-    assert b"Testing search post" in response.data  # Check if the post is in the response
+    assert (
+        b"Testing search post" in response.data
+    )  # Check if the post is in the response
     assert b"This is a test post" in response.data  # Ensure the content is included
-    assert b"test" in response.data  # Check that the query string appears in the rendered template
+    assert (
+        b"test" in response.data
+    )  # Check that the query string appears in the rendered template
